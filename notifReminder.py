@@ -15,13 +15,13 @@ def logging(msg):
     access = 'a'
     filename = getenv('UserProfile') + r'\notifications.log'
     size = 50 * 1024
-    basicConfig(WARNING)
+    basicConfig(level=WARNING)
     file_handler = RotatingFileHandler(filename, access, maxBytes=size,
                                        backupCount=2, encoding=None, delay=0)
     file_format = Formatter('%(asctime)s - %(levelname)s - %(message)s',
                             datefmt='%Y-%m-%d %H:%M:%S')
     file_handler.setLevel(WARNING)
-    file_handler.setFormater(file_format)
+    file_handler.setFormatter(file_format)
     logger = getLogger(__name__)
     logger.addHandler(file_handler)
     logger.warning(msg)
@@ -110,7 +110,6 @@ email_recipient = tkinter.Variable(root)
 
 watching = []
 email_recipients = ['someone@example.com', 'someoneelse@example.com']
-email_recipients = sorted(email_recipients)
 
 entry_frame = tkinter.Frame(root)
 entry_frame.grid(row=0, column=0)
@@ -123,7 +122,8 @@ time_entry.grid(row=0, column=3)
 priority_choice.set('Priority')
 priority = tkinter.OptionMenu(entry_frame, priority_choice, 'P1', 'P2', 'P3')
 priority.grid(row=0, column=4)
-addButton = tkinter.Button(entry_frame, text='Add', command=lambda: add_site(watching), default='active')
+addButton = tkinter.Button(entry_frame, text='Add',
+                           command=lambda: add_site(watching), default='active')
 addButton.grid(row=0, column=5)
 
 list_frame = tkinter.Frame(root)
@@ -135,8 +135,11 @@ delete_button.grid(row=2, column=0)
 
 mail_frame = tkinter.Frame(root)
 mail_frame.grid(row=2, column=0)
-mail_recipient = tkinter.OptionMenu(mail_frame, email_recipient, *email_recipients)
-mail_recipient.grid(row=0, column=0)
+email_label = tkinter.Label(mail_frame, text='Email Recipients')
+email_label.grid(row=0, column=0, sticky='ew')
+mail_recipient = tkinter.OptionMenu(mail_frame, email_recipient,
+                                    *sorted(email_recipients))
+mail_recipient.grid(row=0, column=1, sticky='ew')
 
 schedule.every(30).seconds.do(check_alarms)
 
