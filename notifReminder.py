@@ -61,7 +61,7 @@ def add_site(a):
     if site == '':
         return
     if time_down == '' and priority == '':
-        logging("Bad timer statement")
+        logging('Bad timer statement')
         return
     if time_down != '':
         time_down = int(time_down)
@@ -100,7 +100,7 @@ def remove_alarm():
 
 
 root = tkinter.Tk()
-root.title("Notification Reminder")
+root.title('Notification Reminder')
 root.geometry('390x260+200+200')
 
 site_choice = tkinter.Variable(root)
@@ -114,23 +114,23 @@ email_recipients = sorted(email_recipients)
 
 entry_frame = tkinter.Frame(root)
 entry_frame.grid(row=0, column=0)
-tkinter.Label(entry_frame, text="Clinic:").grid(row=0, column=0)
+tkinter.Label(entry_frame, text='Site:').grid(row=0, column=0)
 site_entry = ttk.Entry(entry_frame, textvariable=site_choice, width=8)
 site_entry.grid(row=0, column=1)
-tkinter.Label(entry_frame, text="Minutes Down:").grid(row=0, column=2)
+tkinter.Label(entry_frame, text='Minutes Down:').grid(row=0, column=2)
 time_entry = ttk.Entry(entry_frame, textvariable=time_down_choice, width=8)
 time_entry.grid(row=0, column=3)
-priority_choice.set("One Hour")
+priority_choice.set('Priority')
 priority = tkinter.OptionMenu(entry_frame, priority_choice, 'P1', 'P2', 'P3')
 priority.grid(row=0, column=4)
-addButton = tkinter.Button(entry_frame, text="Add", command=lambda: add_site(watching), default='active')
+addButton = tkinter.Button(entry_frame, text='Add', command=lambda: add_site(watching), default='active')
 addButton.grid(row=0, column=5)
 
 list_frame = tkinter.Frame(root)
 list_frame.grid(row=1, column=0)
 site_list = tkinter.Listbox(list_frame, width=50)
 site_list.grid(row=0, column=0)
-delete_button = tkinter.Button(list_frame, text="Remove", command=remove_alarm)
+delete_button = tkinter.Button(list_frame, text='Remove', command=remove_alarm)
 delete_button.grid(row=2, column=0)
 
 mail_frame = tkinter.Frame(root)
@@ -142,7 +142,7 @@ schedule.every(30).seconds.do(check_alarms)
 
 root.after(1000, run_schedule)
 
-site_entry.bind("<Return>", add_site)
-time_entry.bind("<Return>", add_site)
+site_entry.bind('<Return>', add_site)
+time_entry.bind('<Return>', add_site)
 site_entry.focus()
 root.mainloop()
