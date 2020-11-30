@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-import schedule
+from schedule import every, run_pending
 from win32com.client import Dispatch
 from os import getenv
-import tkinter
+import tkinter as tk
 from tkinter import ttk
 from operator import itemgetter
 from logging import getLogger, basicConfig, Formatter, WARNING
@@ -30,9 +30,11 @@ def logging(msg):
 def send_alert_email(site_id, priority):
     outlook = Dispatch('outlook.application')
     msg = outlook.CreateItem(0)
-    msg.to = email_recipient.get()
+    msg.to = 'someone@example.com'
     msg.Subject = site_id + ' ' + priority
-    msg.HTMLBody = '<html><body><p>Time for another update!</p></body></html>'
+    msg.HTMLBody = '<html><body><p>Time for another update!\nIt is' \
+                   'important to SLA\'s and the customer\nthat an' \
+                   'update be sent promptly!</p></body></html>'
     try:
         msg.Send()
     except Exception:
@@ -49,7 +51,7 @@ def check_alarms():
 
 
 def run_schedule():
-    schedule.run_pending()
+    run_pending()
     root.after(1000, run_schedule)
 
 
@@ -58,9 +60,10 @@ def add_site(a):
     site = site_entry.get()
     time_down = time_entry.get()
     priority = priority_choice.get()
+    alarm = ''
     if site == '':
         return
-    if time_down == '' and priority == '':
+    if time_down == '' or priority == '':
         logging('Bad timer statement')
         return
     if time_down != '':
@@ -99,53 +102,94 @@ def remove_alarm():
         return
 
 
-root = tkinter.Tk()
-root.title('Notification Reminder')
-root.geometry('390x260+200+200')
+def focus_next(event):
+    event.widget.tk_focusNext().focus()
+    return ('break')
 
-site_choice = tkinter.Variable(root)
-priority_choice = tkinter.Variable(root)
-time_down_choice = tkinter.Variable(root)
-email_recipient = tkinter.Variable(root)
+
+def change_mode(tog=[0]):
+    tog[0] = not tog[0]
+    frames = (entry_frame, list_frame)
+    widgets = (site_label, time_label, site_entry, time_entry, priority_c,
+               add_button, site_list, delete_button, priority_c['menu'],
+               change_button)
+    nbg = '#000000'
+    nfg = '#66FFFF'
+    dbg = '#FFFFFF'
+    dfg = '#000000'
+    
+    if tog[0]:
+        root.option_add('*Backgroun', dbg)
+        root.option_add('*Foreground', dfg)
+        root.configure(background=dbg, highlightbackground=dbg, highlightcolor=dfg)
+        
+        for i in frames:
+            i.configure(background=dbg, highlightbackground=dbg, highlightcolor=dfg)
+        
+        for i in widgets:
+            i.configure(background=dbg, foreground=dfg)
+    else:
+        root.option_add('*Backgroun', nbg)
+        root.option_add('*Foreground', nfg)
+        root.configure(background=nbg, highlightbackground=nbg, highlightcolor=nfg)
+        
+        for i in frames:
+            i.configure(background=nbg, highlightbackground=nbg, highlightcolor=nfg)
+            
+        for i in widgets:
+            i.configure(background=nbg, foreground=nfg)
+
+
+root = tk.Tk()
+root.title('Notification Reminder')
+root.resizable(False, False)
+root.focusmodel('active')
+root.geometry('310x230+200+200')
+
+site_choice = tk.Variable(root)
+priority_choice = tk.Variable(root)
+time_down_choice = tk.Variable(root)
+email_recipient = tk.Variable(root)
 
 watching = []
-email_recipients = ['someone@example.com', 'someoneelse@example.com']
 
-entry_frame = tkinter.Frame(root)
+entry_frame = tk.Frame(root)
 entry_frame.grid(row=0, column=0)
-tkinter.Label(entry_frame, text='Site:').grid(row=0, column=0)
-site_entry = ttk.Entry(entry_frame, textvariable=site_choice, width=8)
-site_entry.grid(row=0, column=1)
-tkinter.Label(entry_frame, text='Minutes Down:').grid(row=0, column=2)
-time_entry = ttk.Entry(entry_frame, textvariable=time_down_choice, width=8)
-time_entry.grid(row=0, column=3)
+site_label = tk.Label(entry_frame, text='Site:')
+site_label.grid(row=0, column=0, sticky='e')
+site_entry = tk.Entry(entry_frame, textvariable=site_choice, width=8)
+site_entry.grid(row=0, column=1, padx=5)
+time_label = tk.Label(entry_frame, text='Time Down:')
+time_label.grid(row=0, column=2)
+time_entry = tk.Entry(entry_frame, textvariable=time_down_choice, width=8)
+time_entry.grid(row=0, column=3, padx=5)
 priority_choice.set('Priority')
-priority = tkinter.OptionMenu(entry_frame, priority_choice, 'P1', 'P2', 'P3')
-priority.grid(row=0, column=4)
-addButton = tkinter.Button(entry_frame, text='Add',
-                           command=lambda: add_site(watching), default='active')
-addButton.grid(row=0, column=5)
+priority_c = tk.OptionMenu(entry_frame, priority_choice, 'P1', 'P2', 'P3')
+priority_c['highlightthickness'] = 0
+priority_c.grid(row=0, column=4, padx=5)
 
-list_frame = tkinter.Frame(root)
+list_frame = tk.Frame(root)
 list_frame.grid(row=1, column=0)
-site_list = tkinter.Listbox(list_frame, width=50)
-site_list.grid(row=0, column=0)
-delete_button = tkinter.Button(list_frame, text='Remove', command=remove_alarm)
-delete_button.grid(row=2, column=0)
+site_list = tk.Listbox(list_frame, width=50)
+site_list.grid(row=0, column=0, columnspan=3)
+add_button = tk.Button(list_frame, text='Add', borderwidth=0.5,
+                       command=lambda: add_site(watching))
+add_button.grid(row=2, column=0, padx=5, pady=5)
+delete_button = tk.Button(list_frame, text='Remove', borderwidth=0.5,
+                          command=remove_alarm)
+delete_button.grid(row=2, column=1, padx=5, pady=5)
 
-mail_frame = tkinter.Frame(root)
-mail_frame.grid(row=2, column=0)
-email_label = tkinter.Label(mail_frame, text='Email Recipients')
-email_label.grid(row=0, column=0, sticky='ew')
-mail_recipient = tkinter.OptionMenu(mail_frame, email_recipient,
-                                    *sorted(email_recipients))
-mail_recipient.grid(row=0, column=1, sticky='ew')
+change_button = tk.Button(list_frame, text='Change', borderwidth=0.5,
+                          command=change_mode)
+change_button.grid(row=2, column=2, padx=5, pady=5)
 
-schedule.every(30).seconds.do(check_alarms)
+every(30).seconds.do(check_alarms)
 
 root.after(1000, run_schedule)
-
+site_entry.bind('<Tab>', focus_next)
 site_entry.bind('<Return>', add_site)
 time_entry.bind('<Return>', add_site)
 site_entry.focus()
+
+    
 root.mainloop()
