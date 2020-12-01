@@ -3,7 +3,6 @@ from schedule import every, run_pending
 from win32com.client import Dispatch
 from os import getenv
 import tkinter as tk
-from tkinter import ttk
 from operator import itemgetter
 from logging import getLogger, basicConfig, Formatter, WARNING
 from logging.handlers import RotatingFileHandler
@@ -32,8 +31,7 @@ def send_alert_email(site_id, priority):
     msg = outlook.CreateItem(0)
     msg.to = 'someone@example.com'
     msg.Subject = site_id + ' ' + priority
-    msg.HTMLBody = '<html><body><p>Time for another update!\nIt is' \
-                   'important to SLA\'s and the customer\nthat an' \
+    msg.HTMLBody = '<html><body><p>Time for another update!\nIt is important to SLA\'s and the customer\nthat an ' \
                    'update be sent promptly!</p></body></html>'
     try:
         msg.Send()
@@ -55,7 +53,7 @@ def run_schedule():
     root.after(1000, run_schedule)
 
 
-def add_site(a):
+def add_site(_):
     entry = []
     site = site_entry.get()
     time_down = time_entry.get()
