@@ -8,8 +8,8 @@ criteria chosen by one of three preset intervals.
 ## Requirements
 To user this software, python 3.8 or higher (32-bit version) is required  
 along with two packages (pywin32 & schedule). These packages can be  
-installed using the following command.
-    “pip install <package_name>”
+installed using the following command.  
+    “pip install <package_name>”  
 To see what version is installed simply open a command prompt and  
 type “python –version”, if an error is received then python is not  
 installed, if the version is less that, if an error is received then  
@@ -20,8 +20,8 @@ required for the software to send emails, and a windows operating system.
 
 ## Setup
 To use this software, a line of code is to be edited. Open the “.py” file  
-and search for the following line:
-    “msg.to = ‘someone@example.com’”
+and search for the following line:  
+    “msg.to = ‘someone@example.com’”  
 Replace the email listed in the file with that of the desired email  
 to receive notifications. The software can be displayed in a light or  
 a dark theme.
